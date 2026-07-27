@@ -1,5 +1,5 @@
 <h1>
-  <img src="https://www.publishloud.com/android-chrome-192x192.png" alt="PublishLoud" width="32" height="32" style="vertical-align: middle; margin-right: 10px;" />
+  <img src="https://www.publishloud.com/android-chrome-192x192.png" alt="PublishLoud" width="48" height="48" style="vertical-align: middle; margin-right: 10px;" />
   <span style="vertical-align: middle;">PublishLoud PR Ship Note</span>
 </h1>
 
