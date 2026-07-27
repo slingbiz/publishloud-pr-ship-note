@@ -3,7 +3,7 @@ description: 'Post a professional X and LinkedIn ship-note draft on pull request
 author: 'PublishLoud'
 branding:
   icon: 'edit'
-  color: 'purple'
+  color: 'pink'
 inputs:
   api-key:
     description: 'PublishLoud API key (pl_live_…). Store as a GitHub Actions secret.'
