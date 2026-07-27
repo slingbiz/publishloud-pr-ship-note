@@ -1,0 +1,25 @@
+name: 'PublishLoud PR Ship Note'
+description: 'Post a professional X and LinkedIn ship-note draft on pull requests via PublishLoud. Human review required before publish.'
+author: 'PublishLoud'
+branding:
+  icon: 'edit'
+  color: 'purple'
+inputs:
+  api-key:
+    description: 'PublishLoud API key (pl_live_…). Store as a GitHub Actions secret.'
+    required: true
+  api-base-url:
+    description: 'PublishLoud API base URL'
+    required: false
+    default: 'https://api.baloon.dev'
+  on-mode:
+    description: 'When to run generation comments: merged (default on merge only for closed events) or opened (also on open / ready_for_review)'
+    required: false
+    default: 'merged'
+  github-token:
+    description: 'GitHub token with pull-requests: write (usually github.token)'
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: 'node24'
+  main: 'src/index.js'

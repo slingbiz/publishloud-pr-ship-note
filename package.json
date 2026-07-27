@@ -1,0 +1,14 @@
+{
+  "name": "publishloud-pr-ship-note",
+  "version": "1.0.0",
+  "description": "GitHub Action: PublishLoud PR ship notes",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "echo 'No build step - runs src/index.js directly'",
+    "package": "npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
