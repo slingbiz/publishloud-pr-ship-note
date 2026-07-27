@@ -1,4 +1,4 @@
-# PublishLoud PR Ship Note
+# <img src="https://www.publishloud.com/android-chrome-192x192.png" alt="PublishLoud" width="36" height="36" align="absmiddle" /> PublishLoud PR Ship Note
 
 **Build in public without the marketing grind.**
 
