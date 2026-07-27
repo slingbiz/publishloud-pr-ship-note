@@ -1,8 +1,21 @@
 const COMMENT_MARKER = '<!-- publishloud-ship-note -->';
 
 function getInput(name, options = {}) {
-  const key = `INPUT_${name.replace(/ /g, '_').toUpperCase()}`;
-  const val = (process.env[key] || '').trim();
+  // GitHub exposes inputs as INPUT_* with spaces/hyphens → underscores.
+  // Try both forms so api-key / on-mode / github-token always resolve.
+  const upper = String(name || '').toUpperCase();
+  const candidates = [
+    `INPUT_${upper.replace(/ /g, '_')}`,
+    `INPUT_${upper.replace(/ /g, '_').replace(/-/g, '_')}`,
+  ];
+  let val = '';
+  for (const key of candidates) {
+    const raw = process.env[key];
+    if (raw != null && String(raw).trim() !== '') {
+      val = String(raw).trim();
+      break;
+    }
+  }
   if (!val && options.required) {
     throw new Error(`Input required and not supplied: ${name}`);
   }
@@ -51,16 +64,18 @@ function resolveEventName(payload) {
 
 function shouldRunForMode(onMode, eventName, payload) {
   const mode = (onMode || 'merged').toLowerCase();
+  const action = payload?.action;
   if (eventName === 'workflow_dispatch') return true;
-  if (payload.action === 'closed' && !payload.pull_request?.merged) {
+  if (action === 'closed' && !payload.pull_request?.merged) {
     return false;
   }
   if (mode === 'opened') {
+    // opened / reopened / synchronize all resolve to eventName "opened"
     return ['opened', 'ready_for_review', 'merged', 'workflow_dispatch'].includes(
       eventName,
     );
   }
-  // merged: comment on merge; also allow ready_for_review / opened if explicitly merged mode only on merge
+  // merged: comment on merge only
   return eventName === 'merged';
 }
 
@@ -187,7 +202,9 @@ async function main() {
 
   const eventName = resolveEventName(payload);
   if (!shouldRunForMode(onMode, eventName, payload)) {
-    info(`Skipping for on-mode=${onMode} event=${eventName}`);
+    info(
+      `Skipping for on-mode=${onMode} event=${eventName} action=${payload.action || ''}`,
+    );
     return;
   }
 
