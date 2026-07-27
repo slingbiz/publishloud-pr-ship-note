@@ -1,4 +1,7 @@
-# <img src="https://www.publishloud.com/android-chrome-192x192.png" alt="PublishLoud" width="36" height="36" align="absmiddle" /> PublishLoud PR Ship Note
+<h1>
+  <img src="https://www.publishloud.com/android-chrome-192x192.png" alt="PublishLoud" width="32" height="32" style="vertical-align: middle; margin-right: 10px;" />
+  <span style="vertical-align: middle;">PublishLoud PR Ship Note</span>
+</h1>
 
 **Build in public without the marketing grind.**
 
