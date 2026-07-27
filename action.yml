@@ -1,5 +1,5 @@
 name: 'PublishLoud PR Ship Note'
-description: 'Post a professional X and LinkedIn ship-note draft on pull requests via PublishLoud. Human review required before publish.'
+description: 'Build in public from your PRs. Turns commits into X and LinkedIn drafts you review and publish - never auto-posts.'
 author: 'PublishLoud'
 branding:
   icon: 'edit'

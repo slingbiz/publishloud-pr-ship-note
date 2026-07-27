@@ -1,6 +1,19 @@
-# PublishLoud PR Ship Note (GitHub Action)
+# PublishLoud PR Ship Note
 
-Posts a professional X and LinkedIn ship-note draft as a pull request comment. You review and publish from PublishLoud. Nothing posts to social automatically.
+**Build in public without the marketing grind.**
+
+This GitHub Action turns your pull requests and commits into smart X and LinkedIn ship-note drafts. You keep building. PublishLoud handles the marketing draft. You review and publish - nothing posts automatically.
+
+## Why
+
+Shipping in silence wastes distribution. Every merge is a story your users and followers should hear. PublishLoud writes that story from your PR context so you stay consistent on social without leaving the codebase.
+
+## What you get
+
+- Professional PR comment with X and LinkedIn drafts
+- One-click Open / Publish links into your PublishLoud desk
+- Human approval before anything goes live
+- Works on merge by default (optional: also on PR open)
 
 ## Install
 
@@ -47,19 +60,12 @@ jobs:
 | `api-key` | yes | | `pl_live_…` from PublishLoud |
 | `api-base-url` | no | `https://api.baloon.dev` | API host |
 | `on-mode` | no | `merged` | `merged` or `opened` |
+| `github-token` | no | `github.token` | Needs `pull-requests: write` |
 
 ## Comment style
 
-Plain, professional markdown. No emoji, no em dashes. Human CTAs only.
-
-## Develop
-
-This package lives in `sling-ai/github-actions/pr-ship-note` until published as the public `publishloud/pr-ship-note` Marketplace repo.
-
-```bash
-npm run build
-```
+Professional GitHub markdown (alerts, branding). No emoji spam. Human CTAs only.
 
 ## Marketplace
 
-Publish this directory as its own GitHub repository and submit it to the GitHub Marketplace under category "Publishing".
+Category: **Publishing**. See `MARKETPLACE.md`.

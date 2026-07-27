@@ -1,33 +1,49 @@
-# GitHub Marketplace listing (draft)
+# GitHub Marketplace listing
 
 **Name:** PublishLoud PR Ship Note  
-**Category:** Publishing / Code Quality (Publishing)  
+**Category:** Publishing  
 **Primary language:** JavaScript  
 
-## Short description
+## Short description (Marketplace limit ~160 chars)
 
-Turn pull requests into X and LinkedIn ship-note drafts as a professional PR comment. Review and publish from PublishLoud - never auto-posts.
+Build in public without the marketing grind. Turns GitHub PRs and commits into X and LinkedIn drafts you review and publish.
 
 ## Full description
 
-PublishLoud generates short, professional social drafts from your PR title, body, commits, and files, then comments on the PR with:
+### Build in public. Keep shipping.
 
-- X copy
-- LinkedIn copy  
-- Links to open the desk or publish (human click required)
+PublishLoud turns your GitHub work into smart marketing updates so you can focus on building - not writing posts.
 
-Access:
+Every meaningful pull request becomes ready-to-publish X and LinkedIn ship notes, based on your commits, PR title, and change summary. The Action comments on the PR with drafts and one-click links. You review and publish from PublishLoud. Nothing posts to social automatically.
 
-- Active trial or Pro: full drafts
-- Expired free plan: upgrade nudge only (no AI tokens)
+### Why teams use it
 
-Skip bots, draft PRs, and the `publishloud-skip` label.
+- Stay consistent on social without leaving the repo
+- Turn shipping into distribution: every merge can become a post
+- Human-in-the-loop by design - you approve before anything goes live
+- Professional comment layout with clear Open / Publish actions
+
+### How it works
+
+1. Install the Action and add your PublishLoud API key
+2. Open or merge a PR
+3. Get X + LinkedIn drafts as a PR comment
+4. Open PublishLoud, tweak if needed, publish
+
+### Access
+
+- **Trial or Pro:** full AI drafts with desk links
+- **Expired free:** upgrade nudge only (no AI tokens)
+
+### Skips
+
+Bots, draft PRs (until ready for review), and the `publishloud-skip` label.
 
 ## Support
 
-https://publishloud.com  
-Docs: see repository README
+https://www.publishloud.com  
+Docs: repository README
 
 ## Icon / branding
 
-Purple / edit icon (see action.yml)
+Purple / edit (see action.yml)
