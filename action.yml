@@ -17,9 +17,18 @@ inputs:
     required: false
     default: 'merged'
   github-token:
-    description: 'GitHub token with pull-requests: write (usually github.token)'
+    description: 'Fallback token (github.token). Comments appear as github-actions unless a GitHub App is configured.'
     required: false
     default: ${{ github.token }}
+  github-app-id:
+    description: 'PublishLoud GitHub App ID (for branded bot name + logo on comments)'
+    required: false
+  github-app-private-key:
+    description: 'PublishLoud GitHub App private key PEM (store as a secret; use \\n for newlines)'
+    required: false
+  github-app-installation-id:
+    description: 'Optional installation id. If omitted, resolved from the current repository.'
+    required: false
 runs:
   using: 'node24'
   main: 'src/index.js'

@@ -1,6 +1,6 @@
 {
   "name": "publishloud-pr-ship-note",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "GitHub Action: PublishLoud PR ship notes",
   "main": "src/index.js",
   "scripts": {

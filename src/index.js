@@ -1,8 +1,9 @@
+const crypto = require('crypto');
+
 const COMMENT_MARKER = '<!-- publishloud-ship-note -->';
 
 function getInput(name, options = {}) {
   // GitHub exposes inputs as INPUT_* with spaces/hyphens → underscores.
-  // Try both forms so api-key / on-mode / github-token always resolve.
   const upper = String(name || '').toUpperCase();
   const candidates = [
     `INPUT_${upper.replace(/ /g, '_')}`,
@@ -70,21 +71,65 @@ function shouldRunForMode(onMode, eventName, payload) {
     return false;
   }
   if (mode === 'opened') {
-    // opened / reopened / synchronize all resolve to eventName "opened"
     return ['opened', 'ready_for_review', 'merged', 'workflow_dispatch'].includes(
       eventName,
     );
   }
-  // merged: comment on merge only
   return eventName === 'merged';
 }
 
-async function githubRequest(method, urlPath, token, body) {
+function base64url(value) {
+  return Buffer.from(value)
+    .toString('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+}
+
+function normalizePrivateKey(pem) {
+  let key = String(pem || '').trim();
+  if (!key) return '';
+  // Secrets often store literal \n
+  key = key.replace(/\\n/g, '\n');
+  if (!key.includes('BEGIN')) {
+    throw new Error('github-app-private-key must be a PEM private key');
+  }
+  return key;
+}
+
+/**
+ * Mint a short-lived GitHub App JWT (RS256).
+ * @param {string} appId
+ * @param {string} privateKeyPem
+ */
+function createAppJwt(appId, privateKeyPem) {
+  const now = Math.floor(Date.now() / 1000);
+  const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+  const payload = base64url(
+    JSON.stringify({
+      iat: now - 60,
+      exp: now + 9 * 60,
+      iss: String(appId),
+    }),
+  );
+  const data = `${header}.${payload}`;
+  const signer = crypto.createSign('RSA-SHA256');
+  signer.update(data);
+  signer.end();
+  const signature = signer
+    .sign(normalizePrivateKey(privateKeyPem), 'base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+  return `${data}.${signature}`;
+}
+
+async function githubRequest(method, urlPath, token, body, authScheme = 'Bearer') {
   const res = await fetch(`https://api.github.com${urlPath}`, {
     method,
     headers: {
       Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${token}`,
+      Authorization: `${authScheme} ${token}`,
       'X-GitHub-Api-Version': '2022-11-28',
       'User-Agent': 'publishloud-pr-ship-note',
       ...(body ? { 'Content-Type': 'application/json' } : {}),
@@ -107,6 +152,76 @@ async function githubRequest(method, urlPath, token, body) {
     throw err;
   }
   return data;
+}
+
+/**
+ * Resolve an installation access token so comments post as the PublishLoud GitHub App
+ * (custom name + logo), like CodeRabbit — not github-actions.
+ */
+async function getInstallationToken({ appId, privateKey, installationId, owner, repo }) {
+  const jwt = createAppJwt(appId, privateKey);
+  let installId = String(installationId || '').trim();
+  if (!installId) {
+    const installation = await githubRequest(
+      'GET',
+      `/repos/${owner}/${repo}/installation`,
+      jwt,
+    );
+    installId = String(installation.id || '');
+  }
+  if (!installId) {
+    throw new Error(
+      'Could not resolve GitHub App installation for this repo. Install the PublishLoud app on the repository.',
+    );
+  }
+  const tokenRes = await githubRequest(
+    'POST',
+    `/app/installations/${installId}/access_tokens`,
+    jwt,
+    {},
+  );
+  if (!tokenRes.token) {
+    throw new Error('GitHub App installation token response missing token');
+  }
+  info(`Using PublishLoud GitHub App installation ${installId} for PR comments`);
+  return tokenRes.token;
+}
+
+async function resolveGitHubToken({ owner, repo }) {
+  const appId = getInput('github-app-id') || process.env.PUBLISHLOUD_GITHUB_APP_ID || '';
+  const privateKey =
+    getInput('github-app-private-key') ||
+    process.env.PUBLISHLOUD_GITHUB_APP_PRIVATE_KEY ||
+    '';
+  const installationId =
+    getInput('github-app-installation-id') ||
+    process.env.PUBLISHLOUD_GITHUB_APP_INSTALLATION_ID ||
+    '';
+
+  if (appId && privateKey) {
+    return getInstallationToken({
+      appId,
+      privateKey,
+      installationId,
+      owner,
+      repo,
+    });
+  }
+
+  const token =
+    getInput('github-token') ||
+    process.env.GITHUB_TOKEN ||
+    process.env.GH_TOKEN ||
+    '';
+  if (!token) {
+    throw new Error(
+      'Pass github-app-id + github-app-private-key (recommended, custom bot identity) or github-token: ${{ github.token }}.',
+    );
+  }
+  info(
+    'Using github.token (comments appear as github-actions). Add a PublishLoud GitHub App for branded identity.',
+  );
+  return token;
 }
 
 async function findExistingComment(token, owner, repo, issueNumber) {
@@ -176,16 +291,6 @@ async function main() {
     default: 'https://api.baloon.dev',
   });
   const onMode = getInput('on-mode', { default: 'merged' });
-  const token =
-    getInput('github-token') ||
-    process.env.GITHUB_TOKEN ||
-    process.env.GH_TOKEN ||
-    '';
-  if (!token) {
-    throw new Error(
-      'GITHUB_TOKEN is required (permissions: pull-requests: write). Pass github-token: ${{ github.token }}.',
-    );
-  }
 
   const payload = parseEvent();
   const pr = payload.pull_request;
@@ -224,6 +329,8 @@ async function main() {
     throw new Error('GITHUB_REPOSITORY is not set');
   }
 
+  const token = await resolveGitHubToken({ owner, repo });
+
   const commitMessages = [];
   try {
     const commits = await githubRequest(
@@ -246,7 +353,6 @@ async function main() {
       'GET',
       `/repos/${owner}/${repo}/pulls/${pr.number}/files?per_page=80`,
       token,
-      null,
     );
     if (Array.isArray(files)) {
       for (const f of files) {

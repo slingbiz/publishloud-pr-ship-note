@@ -41,6 +41,9 @@ jobs:
         with:
           api-key: ${{ secrets.PUBLISHLOUD_API_KEY }}
           github-token: ${{ github.token }}
+          # Optional - branded bot name + logo (see GITHUB_APP.md)
+          github-app-id: ${{ secrets.PUBLISHLOUD_GITHUB_APP_ID }}
+          github-app-private-key: ${{ secrets.PUBLISHLOUD_GITHUB_APP_PRIVATE_KEY }}
           # on-mode: merged   # default - comment when PR is merged
           # on-mode: opened   # also comment when PR is opened / ready for review
 ```
@@ -68,6 +71,10 @@ jobs:
 ## Comment style
 
 Professional GitHub markdown (alerts, branding). No emoji spam. Human CTAs only.
+
+### Bot name and logo (CodeRabbit-style)
+
+Comments from `github.token` always show as **github-actions**. To show **PublishLoud** with your logo as the comment author (like CodeRabbit), create a GitHub App and pass its credentials — see **[GITHUB_APP.md](./GITHUB_APP.md)**.
 
 ## Marketplace
 
